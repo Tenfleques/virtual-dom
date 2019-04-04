@@ -1,0 +1,9 @@
+{
+  "main.js": "/virtual-dom/static/js/main.1635a1f2.chunk.js",
+  "main.js.map": "/virtual-dom/static/js/main.1635a1f2.chunk.js.map",
+  "runtime~main.js": "/virtual-dom/static/js/runtime~main.a26b8628.js",
+  "runtime~main.js.map": "/virtual-dom/static/js/runtime~main.a26b8628.js.map",
+  "index.html": "/virtual-dom/index.html",
+  "precache-manifest.9cf7bb1dd6b4f983c8d90b6287e93d0a.js": "/virtual-dom/precache-manifest.9cf7bb1dd6b4f983c8d90b6287e93d0a.js",
+  "service-worker.js": "/virtual-dom/service-worker.js"
+}
