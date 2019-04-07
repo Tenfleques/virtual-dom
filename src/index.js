@@ -1,6 +1,4 @@
 /** @jsx h */
-import deepDiffMapper from "./Diff"
-
 const initDOM = (
   <div>
     <p>Hello!</p>
@@ -51,51 +49,40 @@ function createElement(node) {
   return $el;
 }
 
-const patch = (dom, vdom, parent=dom.parentNode) => {
-  const replace = parent ? el => (parent.replaceChild(el, dom) && el) : (el => el);
+function changed(node1, node2) {
+  return (typeof node1 !== typeof node2 ||
+         typeof node1 === 'string') && (node1 !== node2 ||
+         node1.type !== node2.type)
+}
 
-  if (typeof vdom != 'object' && dom instanceof Text) {
-      return dom.textContent != vdom ? replace(render(vdom, parent)) : dom;
-  }  else if (typeof vdom == 'object' && dom.nodeName != vdom.type.toUpperCase()) {
-      return replace(render(vdom, parent));
-  } else if (typeof vdom == 'object' && dom.nodeName == vdom.type.toUpperCase()) {
-      const pool = {};
-      [].concat(...dom.childNodes).map((child, index) => {
-          const key = `__key${index}`;
-          pool[key] = child;
-      });
-      [].concat(...vdom.children).map((child, index) => {
-          const key = `__key${index}`;
-          dom.appendChild(pool[key] ? patch(pool[key], child) : render(child, dom));
-          delete pool[key];
-      });
-      for (const key in pool) {
-          pool[key].remove();
-      }
-      return dom;
+function updateElement($parent, newNode, oldNode, index = 0) {
+  if (!oldNode) {
+    $parent.appendChild(
+      createElement(newNode)
+    );
+  } else if (!newNode) {
+    if($parent.childNodes[index]){
+      $parent.removeChild(
+        $parent.childNodes[index]
+      );
+    }
+  } else if (changed(newNode, oldNode)) {
+    $parent.replaceChild(
+      createElement(newNode),
+      $parent.childNodes[index]
+    );
+  } else if (newNode.type) {
+    const newLength = newNode.children.length;
+    const oldLength = oldNode.children.length;
+    for (let i = 0; i < newLength || i < oldLength; i++) {
+      updateElement(
+        $parent.childNodes[index],
+        newNode.children[i],
+        oldNode.children[i],
+        i
+      );
+    }
   }
-};
-
-const render = (vdom, parent=null) => {
-  const mount = parent ? (el => parent.appendChild(el)) : (el => el);
-  if (typeof vdom == 'string' || typeof vdom == 'number') {
-      return mount(document.createTextNode(vdom));
-  } else if (typeof vdom == 'object' && typeof vdom.type == 'string') {
-      const dom = mount(document.createElement(vdom.type));
-      for (const child of [].concat(...vdom.children))
-          render(child, dom);
-      return dom;
-  } else {
-      throw new Error(`Invalid VDOM: ${vdom}.`);
-  }
-};
-
-function updateElement() {
-  // TODO: implement
-  //console.log(arguments[1], arguments[2]);
-  let dom = arguments[0];
-  let newDom = arguments[1];
-  patch(dom, newDom);
 }
 
 
